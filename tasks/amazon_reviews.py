@@ -1,5 +1,6 @@
 from requests_html import HTMLSession
 import random
+from datetime import datetime
 import json
 
 
@@ -40,6 +41,8 @@ class Reviews:
             body = r.xpath('//span[@data-hook="review-body"]', first=True).text
 
             review = {
+                'product_id': self.product_id,
+                'review_id': r.attrs['id'],
                 'name': name,
                 'rating': rating,
                 'title': title,
@@ -67,13 +70,15 @@ class Reviews:
         return results
     
 
-    # save review content to json file
+    # save review content to json file locally
     def save_data(self, results):
         print('Saving data to json...')
-        with open(self.product_id + '-reviews.json', 'w') as f:
+        today = datetime.today().strftime('%Y%m%d')
+        with open(self.product_id + '-' + today + '-reviews.json', 'w') as f:
             json.dump(results, f)
 
 
+    # scrape product title, brand, and rating + review count
     def get_product_info(self):
         # load page and wait for a few seconds to circumvent captcha...
         page = self.session.get(self.url + '1', headers=self.headers)
@@ -81,9 +86,9 @@ class Reviews:
         title = page.html.xpath('//div[@class="a-row product-title"]', first=True).text
         byline = page.html.xpath('//div[@class="a-row product-by-line"]', first=True).text
         brand = byline.split('by')[1]
-        return [brand, title]
+        review_count = page.html.xpath('//div[@data-hook="cr-filter-info-review-rating-count"]', first=True).text
+        return [brand, title, review_count]
 
-        
 
 if __name__ == '__main__':
 
@@ -94,6 +99,7 @@ if __name__ == '__main__':
     amazon_product = Reviews(product_id)
     product_info = amazon_product.get_product_info()
     print(f'Testing review scraper on first {page_num} pages of {product_info[0]}\'s {product_info[1]}...')
+    print(f'This product has {product_info[2]}')
     results = amazon_product.compile_all_pages(page_num)
     amazon_product.save_data(results)
     
