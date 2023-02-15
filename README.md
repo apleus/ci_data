@@ -5,8 +5,6 @@
 TOMORROW:
 
 setup dag that
-0) is dockerized (extend docker with requests_html)
-    - chromium browser? https://stackoverflow.com/questions/73085840/how-to-install-chromium-in-alpine-docker-to-use-html-render-from-requests-html
 1) connects to minio blob storage
 2) scrapes and uploads first two pages of reviews every day
 3) connects to postgres db and creates proper tables when new product
