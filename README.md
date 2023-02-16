@@ -5,7 +5,6 @@
 TOMORROW:
 
 setup dag that
-1) connects to minio blob storage
 2) scrapes and uploads first two pages of reviews every day
 3) connects to postgres db and creates proper tables when new product
 4) updates product table when new scrape occurs

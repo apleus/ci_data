@@ -2,16 +2,14 @@ from requests_html import HTMLSession
 import random
 from datetime import datetime
 import json
+import user_agents
 
 
 class Reviews:
     def __init__(self, product_id):
         self.product_id = product_id
         self.session = HTMLSession()
-        self.headers = {
-            'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-            }
+        self.headers = {'User-Agent': user_agents.get_ua()}
         self.url = f'https://www.amazon.com/product-reviews/{self.product_id}/ref=cm_cr_arp_d_viewopt_srt?sortBy=recent&pageNumber='
 
 
@@ -36,8 +34,16 @@ class Reviews:
             title = r.xpath('//a[@data-hook="review-title"]', first=True).text
             temp_loc_date = r.xpath('//span[@data-hook="review-date"]', first=True).text
             location, date = temp_loc_date.split(" on ")
-            other = r.xpath('//a[@data-hook="format-strip"]', first=True).text
-            verified = r.xpath('//span[@data-hook="avp-badge"]', first=True).text
+            other = ''
+            try:
+                other = r.xpath('//a[@data-hook="format-strip"]', first=True).text
+            except:
+                print("no 'other' data in review...")
+            verified = ''
+            try:
+                verified = r.xpath('//span[@data-hook="avp-badge"]', first=True).text
+            except:
+                print("no verification")
             body = r.xpath('//span[@data-hook="review-body"]', first=True).text
 
             review = {
