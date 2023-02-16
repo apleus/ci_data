@@ -32,7 +32,7 @@ with DAG (
         bash_command='/opt/airflow/tasks/scrape_product_reviews.py'
     )
     # task1 = S3KeySensor(
-    #     task_id = 'sensor_minio_s3',
+    #     task_id = 'sensor_s3',
     #     bucket_name = 'airflow',
     #     bucket_key = 'data.csv',
     #     aws_conn_id = conn_id,

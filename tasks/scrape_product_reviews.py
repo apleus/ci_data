@@ -13,26 +13,23 @@ load_dotenv(dotenv_path='../.env')
 def connect_to_s3():
     try:
         s3_conn = boto3.resource("s3",
-            endpoint_url='http://127.0.0.1:9000',
-            aws_access_key_id=os.environ['MINIO_ROOT_USER'],
-            aws_secret_access_key=os.environ['MINIO_ROOT_PASSWORD'],
-            aws_session_token=None,
-            config=boto3.session.Config(signature_version='s3v4'),
-            verify=False
+            aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+            aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
         )
         return s3_conn
     except NoCredentialsError as e:
         raise (e)
-    
+
+
 def upload_json_to_s3(product_id, results):
     s3_conn = connect_to_s3()
-    # name file "[id]-[YYYMMDD]-reviews.json"
-    filename = product_id + '/' + product_id + '-' + datetime.today().strftime('%Y%m%d') + '-reviews.json'
+
+    # products/[id]/[id]-[YYYMMDD]-reviews.json
+    filename = 'raw/products/' + product_id + '/' + product_id + '-' + datetime.today().strftime('%Y%m%d') + '-reviews.json'
     tmp = NamedTemporaryFile()
     with open(tmp.name, 'w') as f:
         json.dump(results, f)
-        s3_conn.meta.client.upload_file(Filename=tmp.name, Bucket='products', Key=filename)
-
+        s3_conn.meta.client.upload_file(Filename=tmp.name, Bucket='ci-product-reviews-1', Key=filename)
 
 
 if __name__ == "__main__":

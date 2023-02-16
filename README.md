@@ -6,6 +6,7 @@ TOMORROW:
 
 setup dag that
 2) scrapes and uploads first two pages of reviews every day
+
 3) connects to postgres db and creates proper tables when new product
 4) updates product table when new scrape occurs
 5) incorporate update logic for new reviews scraped
