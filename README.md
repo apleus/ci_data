@@ -1,24 +1,29 @@
 # ci_data
 
+Misc notes...
 
+TODOS:
 
 TOMORROW:
+- clean newest data file for each product with pydantic (prep)
+- connect to aws db (redshift, or RDS?)
+- create reviews table and adds new data files to reviews table in aws db
+- 
 
-setup dag that
-2) scrapes and uploads first two pages of reviews every day
-
-3) connects to postgres db and creates proper tables when new product
-4) updates product table when new scrape occurs
-5) incorporate update logic for new reviews scraped
-6) dag with sensor that updates reviews table with every new file
-7) pydantic?
+FRIDAY:
+- creates / updates scrapes table with successful scrape + creates product table when necessary
+- incorporate update logic for page counter by referencing db
+- dbt transformations?
 
 
 
 Schema notes:
 
 Products table:
-PRODUCT_ID | BRAND | PRODUCT TITLE | DATE SCRAPED | REVIEW COUNT
+PRODUCT_ID | BRAND | PRODUCT TITLE
+
+Scrapes table:
+PRODUCT_ID | DATE SCRAPED | REVIEW COUNT
 
 Reviews table:
 PRODUCT_ID | NAME | RATING | TITLE | LOCATION | DATE | OTHER | VERIFIED | BODY
