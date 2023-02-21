@@ -6,7 +6,10 @@ TODOS:
 
 TOMORROW:
 - clean newest data file for each product with pydantic (prep)
-- connect to aws db (redshift, or RDS?)
+    - script that puts data in dataframe, formats text, runs through validators
+    - write pydantic validators
+    - convert to csv
+- connect to aws db (redshift, or RDS?) (load csvs)
 - create reviews table and adds new data files to reviews table in aws db
 - 
 
@@ -23,7 +26,7 @@ Products table:
 PRODUCT_ID | BRAND | PRODUCT TITLE
 
 Scrapes table:
-PRODUCT_ID | DATE SCRAPED | REVIEW COUNT
+PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS (raw, prep, transform)
 
 Reviews table:
 PRODUCT_ID | NAME | RATING | TITLE | LOCATION | DATE | OTHER | VERIFIED | BODY
@@ -41,9 +44,9 @@ date = datetime.strptime(date,'%B %d, %Y').strftime("%Y-%m-%d")
 separate out 'other' attributes...
 
 
-Extensions:
+Opportunities for extensions:
 
-automate scraping of product ids for deeper analyses
+add stage at the front of the pipeline to scrape and aggregate product ids. deeper analyses across more products
 
 
 Products:
