@@ -55,6 +55,7 @@ class Reviews:
             verified = r.xpath('//span[@data-hook="avp-badge"]', first=True).text
         except:
             print("no verification")
+            
         review = {
             'product_id': self.product_id,
             'review_id': r.attrs['id'],

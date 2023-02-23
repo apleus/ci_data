@@ -1,6 +1,8 @@
 import os
 import json
+import pandas as pd
 from tempfile import NamedTemporaryFile
+import shutil
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 
@@ -29,12 +31,29 @@ def upload_json_to_s3(bucket, filename, data):
     Inputs:
     - bucket (str): name of bucket
     - filename (str): name of file (typically, raw/products/[id]/[id]-[YYYYMMDD]-reviews.json)
-    - data (list): json data (typically, product reviews)
+    - data (list of dicts): list of dicts data (typically, product reviews)
     """
     s3_conn = connect_to_s3()
     tmp = NamedTemporaryFile(mode="w+")
     json.dump(data, tmp)
     tmp.flush()
+    s3_conn.meta.client.upload_file(Filename=tmp.name, Bucket=bucket, Key=filename)
+    tmp.close()
+
+
+def upload_df_csv_to_s3(bucket, filename, df):
+    """
+    Upload dataframe as csv to s3 with sep = '|'
+
+    Inputs:
+    - bucket (str): name of bucket
+    - filename (str): name of file (typically, prep/products/[id]/[id]-[YYYYMMDD]-reviews.csv)
+    - df (pandas dataframe): dataframe of reviews
+    """
+    s3_conn = connect_to_s3()
+    tmp = NamedTemporaryFile(mode="w+")
+    tmp.flush()
+    df.to_csv(path_or_buf=tmp.name, sep='|')
     s3_conn.meta.client.upload_file(Filename=tmp.name, Bucket=bucket, Key=filename)
     tmp.close()
 

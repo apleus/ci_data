@@ -19,7 +19,7 @@ def scrape_net_new_reviews(product_ids):
         # get recent reviews
         bucket = os.environ['AWS_BUCKET_REVIEWS']
         filename = 'raw/products/' + product_id + '/' + product_id + '-' + datetime.today().strftime('%Y%m%d') + '-reviews.json'
-        reviews = amazon_product.compile_all_pages(page_num)
+        reviews = amazon_product.parse_pages(page_num)
         s3_helpers.upload_json_to_s3(bucket, filename, reviews)
 
 
