@@ -1,8 +1,4 @@
-CREATE TABLE IF NOT EXISTS pipeline_metadata (
-    product_id varchar(12) NOT NULL,
-    date char(8) NOT NULL,
-    review_count int NOT NULL,
-    status varchar(20) NOT NULL,
-    PRIMARY KEY (product_id, date)
-)
+INSERT INTO pipeline_metadata (product_id, date, review_count, status)
+    VALUES ('{product_id}', '{date}', '{review_count}', '{status}')
+ON CONFLICT (product_id, date, status) DO NOTHING;
 

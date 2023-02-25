@@ -18,7 +18,7 @@ def connect_to_rds():
         )
         return conn
     except Exception as e:
-        print(e)
+        raise (e)
 
 
 def connect_to_s3():

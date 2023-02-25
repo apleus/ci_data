@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 import json
 import user_agents
+import logging
 
 
 class Reviews:
@@ -48,13 +49,13 @@ class Reviews:
         other = ''
         try:
             other = r.xpath('//a[@data-hook="format-strip"]', first=True).text
-        except:
-            print("no 'other' data in review...")
+        except AttributeError as e:
+            logging.info(e)
         verified = ''
         try:
             verified = r.xpath('//span[@data-hook="avp-badge"]', first=True).text
-        except:
-            print("no verification")
+        except AttributeError as e:
+            logging.info(e)
             
         review = {
             'product_id': self.product_id,
@@ -88,9 +89,9 @@ class Reviews:
                 for r in page_of_review_elements:
                     review_json = self.parse_single_review(r)
                     reviews.append(review_json)
-                print(f'Scraped page {i}...')
+                logging.info(f'Scraped page {i}...')
             else:
-                print('End of reviews...')
+                logging.info('End of reviews...')
                 break
         return reviews
     

@@ -1,5 +1,6 @@
 import pydantic
 
+
 class ReviewModel(pydantic.BaseModel):
 
     product_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
@@ -13,7 +14,15 @@ class ReviewModel(pydantic.BaseModel):
     verified: bool
     body: str = pydantic.Field(regex='[^|]*') # no '|' delimineter
 
+
 class ProductModel(pydantic.BaseModel):
     product_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
     brand: str = pydantic.Field(regex='[^\']*') # no single quotes
     title: str = pydantic.Field(regex='[^\']*') # no single quotes
+
+
+class PipelineMetadataModel(pydantic.BaseModel):
+    product_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
+    date: str = pydantic.Field(regex='^[0-9]{8}$') # 8 digits
+    review_count: int
+    status: int = pydantic.Field(..., ge=1, le=4) # ints 1-4 inclusive -- 1=init, 2=raw, 3=prep, 4=loaded
