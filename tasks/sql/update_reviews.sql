@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS reviews(
     date char(8) NOT NULL,
     other varchar(100),
     verified bit NOT NULL,
-    body varchar(30000)
+    body varchar(30000),
+    PRIMARY KEY (product_id, review_id)
 )
 

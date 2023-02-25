@@ -4,7 +4,21 @@ import pandas as pd
 from tempfile import NamedTemporaryFile
 import shutil
 import boto3
+import psycopg2
 from botocore.exceptions import ClientError, NoCredentialsError
+
+
+def connect_to_rds():
+    try:
+        conn = psycopg2.connect(
+            host=os.environ['RDS_HOST'],
+            port=os.environ['RDS_PORT'],
+            user=os.environ['RDS_USER'],
+            password=os.environ['RDS_PW']
+        )
+        return conn
+    except Exception as e:
+        print(e)
 
 
 def connect_to_s3():

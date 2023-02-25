@@ -3,7 +3,7 @@ import pandas as pd
 import json
 from dotenv import load_dotenv
 from datetime import datetime
-import s3_helpers
+import aws_helpers
 import re
 from extract_models import ReviewModel
 from typing import List
@@ -28,7 +28,7 @@ def s3_json_to_df(product_id, date):
     """
     bucket = os.environ['AWS_BUCKET_REVIEWS']
     filename = 'raw/products/' + product_id + '/' + product_id + '-' + date + '-reviews.json'
-    json_content = s3_helpers.get_json_from_s3(bucket, filename)
+    json_content = aws_helpers.get_json_from_s3(bucket, filename)
     df = pd.DataFrame.from_dict(json_content, orient='columns')
     return df
 
@@ -39,7 +39,7 @@ def df_to_csv_s3(product_id, date, df):
     """
     bucket = os.environ['AWS_BUCKET_REVIEWS']
     filename = 'prep/products/' + product_id + '/' + product_id + '-' + date + '-reviews.csv'
-    s3_helpers.upload_df_csv_to_s3(bucket, filename, df)
+    aws_helpers.upload_df_csv_to_s3(bucket, filename, df)
 
 
 def sanitize_df(df):

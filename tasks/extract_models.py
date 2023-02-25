@@ -12,3 +12,8 @@ class ReviewModel(pydantic.BaseModel):
     other: str = pydantic.Field(regex='[^|]*') # no '|' delimineter
     verified: bool
     body: str = pydantic.Field(regex='[^|]*') # no '|' delimineter
+
+class ProductModel(pydantic.BaseModel):
+    product_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
+    brand: str = pydantic.Field(regex='[^\']*') # no single quotes
+    title: str = pydantic.Field(regex='[^\']*') # no single quotes
