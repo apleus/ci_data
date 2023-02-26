@@ -5,10 +5,3 @@ CREATE TABLE IF NOT EXISTS pipeline_metadata (
     status int NOT NULL,
     PRIMARY KEY (product_id, date, status)
 );
-
-SELECT (review_count) FROM (
-    SELECT * FROM pipeline_metadata
-    WHERE product_id='{product_id}' AND status=4
-) filtered_metadata
-    ORDER BY date
-    DESC LIMIT 1;

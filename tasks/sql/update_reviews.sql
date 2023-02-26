@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS reviews(
     verified bit NOT NULL,
     body varchar(30000),
     PRIMARY KEY (product_id, review_id)
-)
+);
 

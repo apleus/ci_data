@@ -8,7 +8,7 @@ import re
 from extract_models import ReviewModel
 from typing import List
 from pydantic import ValidationError
-
+import query_helpers
 
 """
 Sanitizes and validates 'raw' data and saves as 'prep' data
@@ -17,7 +17,7 @@ Sanitizes and validates 'raw' data and saves as 'prep' data
 def get_filenames():
     """
     Get raw filenames to sanitize + validate and generate prep filenames to save
-    - get product IDs from products.txt
+    - get product IDs
     - for each product ID...
         - find latest raw file to sanitize + validate
         - generate relevant raw and prep filenames
@@ -27,26 +27,30 @@ def get_filenames():
     """
     today = datetime.today().strftime('%Y%m%d')
 
-    product_ids = []
-    with open('products.txt') as f:
-        product_ids = [line.rstrip() for line in f]
+    product_ids = query_helpers.get_product_list()
 
     conn = aws_helpers.connect_to_rds()
     cursor = conn.cursor()
 
     filenames = []
     for id in product_ids:
-        query_file = open('./sql/get_raw_pipeline_metadata.sql', 'r')
+        query_file = open('./sql/get_pipeline_metadata.sql', 'r')
         query = query_file.read()
-        cursor.execute(query.format(product_id=id))
-        date = cursor.fetchall()
+        cursor.execute(query.format(product_id=id, status=2))
+        query_result = cursor.fetchall()
+        date, review_count = ['','']
         try:
-            date = date[0][0]
+            date = query_result[0][0]
+            review_count = query_result[0][1]
         except IndexError as e:
             raise(e)
         raw_filename = 'raw/products/' + id + '/' + id + '-' + date + '-reviews.json'
         prep_filename = 'prep/products/' + id + '/' + id + '-' + today + '-reviews.csv'
-        filenames.append([raw_filename, prep_filename])
+        filenames.append([raw_filename, prep_filename, id, date, review_count])
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
     
     return filenames
 
@@ -93,7 +97,7 @@ if __name__ == "__main__":
 
     for product in filenames:
         # get
-        raw_filename, prep_filename = product
+        raw_filename, prep_filename, id, date, review_count = product
         json_content = aws_helpers.get_json_from_s3(bucket, raw_filename)
         # sanitize
         df = pd.DataFrame.from_dict(json_content, orient='columns')
@@ -108,3 +112,9 @@ if __name__ == "__main__":
         # upload
         aws_helpers.upload_df_csv_to_s3(bucket, prep_filename, df)
 
+        conn = aws_helpers.connect_to_rds()
+        cursor = conn.cursor()
+        cursor.execute(query_helpers.update_pipeline_metadata_table(id, date, review_count, 3))
+        conn.commit()
+        cursor.close()
+        conn.close()
