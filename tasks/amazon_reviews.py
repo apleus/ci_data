@@ -23,10 +23,10 @@ class Reviews:
         Return list of review html elements from single page of reviews
         (after first loading page and waiting a few seconds to circumvent captcha)
 
-        Inputs:
-        page_num (int): number of pages 
+        Args:
+            page_num (int): number of pages 
         Returns:
-        reviews (list): list of reviews (html elements)
+            reviews (list): list of reviews (html elements)
         """
         page = self.session.get(self.url + str(page_num), headers=self.headers)
         page.html.render(sleep=random.random()*3)
@@ -39,10 +39,10 @@ class Reviews:
         """
         Parses single review to extract review content and metadata
 
-        Inputs:
-        r (html element): single product review
+        Args:
+            r (html element): single product review
         Returns:
-        review (dict): dictionary of review contenta and metadata
+            review (dict): dictionary of review contenta and metadata
         """
         temp_loc_date = r.xpath('//span[@data-hook="review-date"]', first=True).text
         location, date = temp_loc_date.split(" on ")
@@ -77,10 +77,10 @@ class Reviews:
         """
         Compile reviews of a specified number of pages into a single json
 
-        Inputs:
-        page_num (int): number of pages of reviews to scrape
+        Args:
+            page_num (int): number of pages of reviews to scrape
         Returns:
-        all_reviews (list): json of reviews
+            all_reviews (list): json of reviews
         """
         reviews = []
         for i in range(1, page_num + 1):
@@ -100,8 +100,8 @@ class Reviews:
         """
         Save json data to local file with name [id]-[YYYMMDD]-reviews.json
 
-        Inputs:
-        results (list): json of reviews
+        Args:
+            results (list): json of reviews
         """
         print('Saving data to json...')
         today = datetime.today().strftime('%Y%m%d')
@@ -114,9 +114,9 @@ class Reviews:
         Scrape product title, brand, and rating + review count
         
         Return:
-        brand (str): product brand
-        title: product title
-        review_count: string describing number of ratings and reviews
+            brand (str): product brand
+            title: product title
+            review_count: string describing number of ratings and reviews
         """
         page = self.session.get(self.url + '1', headers=self.headers)
         page.html.render(sleep=random.random()*3)

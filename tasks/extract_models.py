@@ -1,8 +1,10 @@
 import pydantic
 
+"""
+Pydantic models used to validate various data
+"""
 
 class ReviewModel(pydantic.BaseModel):
-
     product_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
     review_id: str = pydantic.Field(regex='^[A-Z0-9]+$') # alphanumeric
     name: str = pydantic.Field(regex='[^|]*') # no '|' delimineter

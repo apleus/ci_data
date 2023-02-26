@@ -9,14 +9,20 @@ from botocore.exceptions import ClientError, NoCredentialsError
 
 
 def connect_to_rds():
+    """
+    Connect to RDS Resource using psycopg2
+
+    Returns:
+        s3_conn: S3 Resource connection
+    """
     try:
-        conn = psycopg2.connect(
+        rds_conn = psycopg2.connect(
             host=os.environ['RDS_HOST'],
             port=os.environ['RDS_PORT'],
             user=os.environ['RDS_USER'],
             password=os.environ['RDS_PW']
         )
-        return conn
+        return rds_conn
     except Exception as e:
         raise (e)
 
@@ -26,7 +32,7 @@ def connect_to_s3():
     Connect to AWS S3 Resource using boto3 Session
 
     Returns:
-    - s3_conn: S3 Resource connection
+        s3_conn: S3 Resource connection
     """
     try:
         s3_conn = boto3.resource("s3",
@@ -42,10 +48,10 @@ def upload_json_to_s3(bucket, filename, data):
     """
     Upload json data to s3
 
-    Inputs:
-    - bucket (str): name of bucket
-    - filename (str): name of file (typically, raw/products/[id]/[id]-[YYYYMMDD]-reviews.json)
-    - data (list of dicts): list of dicts data (typically, product reviews)
+    Args:
+        bucket (str): name of bucket
+        filename (str): name of file (typically, raw/products/[id]/[id]-[YYYYMMDD]-reviews.json)
+        data (list of dicts): list of dicts data (typically, product reviews)
     """
     s3_conn = connect_to_s3()
     tmp = NamedTemporaryFile(mode="w+")
@@ -59,10 +65,10 @@ def upload_df_csv_to_s3(bucket, filename, df):
     """
     Upload dataframe as csv to s3 with sep = '|'
 
-    Inputs:
-    - bucket (str): name of bucket
-    - filename (str): name of file (typically, prep/products/[id]/[id]-[YYYYMMDD]-reviews.csv)
-    - df (pandas dataframe): dataframe of reviews
+    Args:
+        bucket (str): name of bucket
+        filename (str): name of file (typically, prep/products/[id]/[id]-[YYYYMMDD]-reviews.csv)
+        df (pandas dataframe): dataframe of reviews
     """
     s3_conn = connect_to_s3()
     tmp = NamedTemporaryFile(mode="w+")
@@ -76,11 +82,11 @@ def get_json_from_s3(bucket, filename):
     """
     Retrieve content from json file in s3
 
-    Inputs:
-    - bucket (str): name of bucket
-    - filename (str): name of file
+    Args:
+        bucket (str): name of bucket
+        filename (str): name of file
     Returns:
-    - json_content (list): json content from specified s3 file
+        json_content (list): json content from specified s3 file
     """
     s3_conn = connect_to_s3()
     obj = s3_conn.Object(bucket, filename)

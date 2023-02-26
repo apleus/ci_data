@@ -14,48 +14,27 @@ import query_helpers
 Sanitizes and validates 'raw' data and saves as 'prep' data
 """
 
-def get_filenames():
+def parse_query_result(query_result):
     """
-    Get raw filenames to sanitize + validate and generate prep filenames to save
-    - get product IDs
-    - for each product ID...
-        - find latest raw file to sanitize + validate
-        - generate relevant raw and prep filenames
+    Use result of sql query to get most recent raw
 
+    Args:
+        query_result (tuple): presumably (date, review_count)
     Returns:
-        filenames (list): list of filename lists [[raw, prep], [raw, prep], ...]
+        date (str): date of most recent raw file
+        review_count (int): number of total reviews
+            when most recent raw file was scraped
     """
-    today = datetime.today().strftime('%Y%m%d')
-
-    product_ids = query_helpers.get_product_list()
-
-    conn = aws_helpers.connect_to_rds()
-    cursor = conn.cursor()
-
-    filenames = []
-    for id in product_ids:
-        query_file = open('./sql/get_pipeline_metadata.sql', 'r')
-        query = query_file.read()
-        cursor.execute(query.format(product_id=id, status=2))
-        query_result = cursor.fetchall()
-        date, review_count = ['','']
-        try:
-            date = query_result[0][0]
-            review_count = query_result[0][1]
-        except IndexError as e:
-            raise(e)
-        raw_filename = 'raw/products/' + id + '/' + id + '-' + date + '-reviews.json'
-        prep_filename = 'prep/products/' + id + '/' + id + '-' + today + '-reviews.csv'
-        filenames.append([raw_filename, prep_filename, id, date, review_count])
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return filenames
+    date, review_count = ['', 0]
+    try:
+        date = query_result[0]
+        review_count = int(query_result[1])
+    except IndexError as e:
+        raise(e)
+    return date, review_count
 
 
-def sanitize_df(df):
+def sanitize_json(json_content):
     """
     sanitize dataframe of reviews data
     - remove '|' separators from name, title, other, body
@@ -64,13 +43,14 @@ def sanitize_df(df):
     - convert date string to YYYYMMDD
     - simplify verified string to bool
 
-    TODO: Better way of parsing 'other' ?
+    TODO EXTENSION: Better way of parsing 'other' ?
 
-    Inputs:
-    df (pandas dataframe): dataframe of reviews
+    Args:
+        json_content (list of dicts): raw reviews
     Returns:
-    df (pandas dataframe): dataframe of sanitized reviews
+        df (pandas dataframe): dataframe of sanitized reviews
     """
+    df = pd.DataFrame.from_dict(json_content, orient='columns')
 
     df['name'] = df['name'].map(lambda x: x.replace('|', ''))
     df['rating'] = df['rating'].map(lambda x: int(str(x)[0]))
@@ -84,6 +64,20 @@ def sanitize_df(df):
     return df
 
 
+def validate_df(df):
+    """
+    Use pydantic model to ensure sanitized data properly structured
+
+    Args:
+        df (dataframe): santizied review data
+    """
+    try:
+        reviews: List[ReviewModel] = [ReviewModel(**review) for review in df.to_dict('records')]
+    except ValidationError as e:
+        print("Pydantic Validation Error...")
+        print(e)
+
+
 if __name__ == "__main__":
     """
     For each new raw reviews file:
@@ -93,28 +87,42 @@ if __name__ == "__main__":
     """
     load_dotenv(dotenv_path='../.env')
     bucket = os.environ['AWS_BUCKET_REVIEWS']
-    filenames = get_filenames()
+    today = datetime.today().strftime('%Y%m%d')
+    product_ids = query_helpers.get_product_list()
 
-    for product in filenames:
-        # get
-        raw_filename, prep_filename, id, date, review_count = product
-        json_content = aws_helpers.get_json_from_s3(bucket, raw_filename)
-        # sanitize
-        df = pd.DataFrame.from_dict(json_content, orient='columns')
-        df = sanitize_df(df)
-        # validate
-        data_dict = df.to_dict('records')
-        try:
-            reviews: List[ReviewModel] = [ReviewModel(**review) for review in data_dict]
-        except ValidationError as e:
-            print("Pydantic Validation Error...")
-            print(e)
-        # upload
-        aws_helpers.upload_df_csv_to_s3(bucket, prep_filename, df)
+    # connect to rds
+    conn = aws_helpers.connect_to_rds()
+    cursor = conn.cursor()
 
-        conn = aws_helpers.connect_to_rds()
-        cursor = conn.cursor()
-        cursor.execute(query_helpers.update_pipeline_metadata_table(id, date, review_count, 3))
-        conn.commit()
-        cursor.close()
-        conn.close()
+    pipeline_metadata_updates = ""
+    for id in product_ids:
+
+        # get most recent raw reviews json data
+        cursor.execute(query_helpers.get_pipeline_metadata(product_id=id, status=2))
+        date, review_count = parse_query_result(cursor.fetchall()[0])
+        json_content = aws_helpers.get_json_from_s3(
+            bucket=bucket,
+            filename='raw/products/' + id + '/' + id + '-' + date + '-reviews.json'
+        )
+
+        # sanitize & validate data
+        df = sanitize_json(json_content)
+        validate_df(df)
+
+        # upload sanitized and validated data as csv
+        aws_helpers.upload_df_csv_to_s3(
+            bucket=bucket,
+            filename='prep/products/' + id + '/' + id + '-' + today + '-reviews.csv',
+            df=df
+        )
+
+        # craft query to update pipeline_metadata
+        pipeline_metadata_updates += query_helpers.update_pipeline_metadata_table(id, today, review_count, 3)
+    
+    # execute all relevant updates to pipeline_metadata table
+    cursor.execute(pipeline_metadata_updates)
+    
+    # clean up rds connection
+    conn.commit()
+    cursor.close()
+    conn.close()

@@ -92,6 +92,7 @@ if __name__ == "__main__":
     # execute all relevant updates to pipeline_metadata and products tables
     cursor.execute(db_updates)
 
+    # clean up rds connection
     conn.commit()
     cursor.close()
     conn.close()

@@ -25,14 +25,6 @@ App flow...
 
 TODOS:
 
-refactor so extract goes like this:
-- get products
-- connect...
-- init admin databases (can you execute multiple queries at once?)
-- get review_count info
-- do the scraping, return metadata
-- update admin databases (can you execute multiple queries at once?)
-
 
 3. add new reviews to reviews table
 3b. update scrapes table to show completed E, L
