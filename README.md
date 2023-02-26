@@ -2,22 +2,51 @@
 
 Misc notes...
 
+App flow...
+
+0. Prepare for scrape
+- (manually) specify products to watch in products.txt
+- extract_raw_review_data.py
+    - for each product
+        - Initialize products, pipeline_metadata tables if necessary
+        - Get last review_count to calculate how many product review pages to scrape
+        - Update pipeline_metadata to signify raw scrape started
+        - Scrape product reviews and upload to s3 as json
+        - Update pipeline_metadata to signify raw scrape complete
+- prep_review_data.py
+    - for each product
+        - find most recent raw data file
+        - sanitize review data
+        - validate review data
+        - Upload sanitized data to s3 as csv
+        - Update pipeline_metadata to signify prep complete
+- prep_data_to_rds.py
+    - for each product
+
 TODOS:
 
-TOMORROW:
-- clean newest data file for each product with pydantic (prep)
-    - script that puts data in dataframe, formats text, runs through validators
-    - write pydantic validators
-    - convert to csv
-- connect to aws db (redshift, or RDS?) (load csvs)
-- create reviews table and adds new data files to reviews table in aws db
-- 
+refactor so extract goes like this:
+- get products
+- connect...
+- init admin databases (can you execute multiple queries at once?)
+- get review_count info
+- do the scraping, return metadata
+- update admin databases (can you execute multiple queries at once?)
 
-FRIDAY:
-- creates / updates scrapes table with successful scrape + creates product table when necessary
-- incorporate update logic for page counter by referencing db
-- dbt transformations?
 
+3. add new reviews to reviews table
+3b. update scrapes table to show completed E, L
+refactor...
+- should you update pipeline_metadata instead of adding new entry?
+    - change key to just product_id, date
+
+EVENTUALLY:
+- dbt transformations
+- d3.js
+- Terraform
+- airflow
+- put onto AWS
+- automate EC2, RDS to stop with action tied to budget alert...
 
 
 Schema notes:
@@ -26,22 +55,15 @@ Products table:
 PRODUCT_ID | BRAND | PRODUCT TITLE
 
 Scrapes table:
-PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS (raw, prep, transform)
+PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS (init, raw, prep, transform)
 
 Reviews table:
 PRODUCT_ID | NAME | RATING | TITLE | LOCATION | DATE | OTHER | VERIFIED | BODY
 
+extenion:
+
 Images table:
 PRODUCT_ID | IMAGE1_LINK | ...
-
-
-
-
-Transformations to do:
-
-rating
-date = datetime.strptime(date,'%B %d, %Y').strftime("%Y-%m-%d")
-separate out 'other' attributes...
 
 
 Opportunities for extensions:

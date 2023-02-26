@@ -1,13 +1,29 @@
 from extract_models import ProductModel, PipelineMetadataModel
 from pydantic import ValidationError
 
+
 def get_product_list():
+    """
+    Get list of product ids to track
+    TODO EXTENSION: create more systematic way for scraping relevant product IDs
+
+    Returns:
+        product_ids (list): list of strings of product IDs
+    """
     product_ids = []
     with open('products.txt') as f:
         product_ids = [line.rstrip() for line in f]
     return product_ids
 
+
 def init_products_table():
+    """
+    Generate query that initalizes products table if it
+    doesn't exist
+
+    Returns:
+        query: SQL query string
+    """
     query_file = open('./sql/init_products.sql', 'r')
     query = query_file.read()
     return query
@@ -18,13 +34,12 @@ def update_products_table(product_id, brand, title):
     Sanitizes and validates product data and crafts query
     to update products table with new product data
 
-    Inputs:
-    product_id (str): unique product ID
-    brand (str): product brand as listed on amazon
-    title (str): title of product as listed on amazon
+    Args:
+        product_id (str): unique product ID
+        brand (str): product brand as listed on amazon
+        title (str): title of product as listed on amazon
     Returns:
-    query: creates products table if necessary, adds
-        product data to products table if necessary
+        query: adds product data to products table if necessary
     """
 
     # sanitize product data
@@ -56,14 +71,11 @@ def update_products_table(product_id, brand, title):
 
 def init_pipeline_metadata_table():
     """
-    Create query to extract latest review_count for specific product_id
-    from pipeline_metadata
+    Generate query that initalizes pipeline_metadata table if it
+    doesn't exist
 
-    Args:
-        product_id (str): unique ID of product
     Returns:
-        query: creates pipeline metadata_table if necessary,
-            extracts latest review_count for product
+        query: SQL query string
     """
 
     # create query to update pipeline_metadata table
@@ -74,14 +86,15 @@ def init_pipeline_metadata_table():
 
 def get_pipeline_metadata(product_id, status):
     """
-    Extract latest review_count for specific product_id
+    Extract latest date, review_count for specific product_id & status
     from pipeline_metadata
 
     Args:
         product_id (str): unique ID of product
+        status (int): 1=extract initialized, 2=extract completed,
+                    3=prep completed, 4=uploaded to RDS
     Returns:
-        query: creates pipeline metadata_table if necessary,
-            extracts latest review_count for product
+        query: extracts latest review_count for product
     """
 
     # create query to update pipeline_metadata table

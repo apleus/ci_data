@@ -3,3 +3,4 @@ venv/
 minio/
 .env
 logs/*
+notes.txt
