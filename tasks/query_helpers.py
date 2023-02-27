@@ -145,3 +145,34 @@ def update_pipeline_metadata_table(product_id, date, review_count, status):
         status=status
     )
     return query
+
+def init_reviews_table():
+    """
+    Generate query that initalizes products table if it
+    doesn't exist
+
+    Returns:
+        query: SQL query string
+    """
+    query_file = open('./sql/init_reviews.sql', 'r')
+    query = query_file.read()
+    return query
+
+def parse_query_result(query_result):
+    """
+    Use result of sql query to get most recent raw
+
+    Args:
+        query_result (tuple): presumably (date, review_count)
+    Returns:
+        date (str): date of most recent raw file
+        review_count (int): number of total reviews
+            when most recent raw file was scraped
+    """
+    date, review_count = ['', 0]
+    try:
+        date = query_result[0]
+        review_count = int(query_result[1])
+    except IndexError as e:
+        raise(e)
+    return date, review_count

@@ -14,26 +14,6 @@ import query_helpers
 Sanitizes and validates 'raw' data and saves as 'prep' data
 """
 
-def parse_query_result(query_result):
-    """
-    Use result of sql query to get most recent raw
-
-    Args:
-        query_result (tuple): presumably (date, review_count)
-    Returns:
-        date (str): date of most recent raw file
-        review_count (int): number of total reviews
-            when most recent raw file was scraped
-    """
-    date, review_count = ['', 0]
-    try:
-        date = query_result[0]
-        review_count = int(query_result[1])
-    except IndexError as e:
-        raise(e)
-    return date, review_count
-
-
 def sanitize_json(json_content):
     """
     sanitize dataframe of reviews data
@@ -99,7 +79,7 @@ if __name__ == "__main__":
 
         # get most recent raw reviews json data
         cursor.execute(query_helpers.get_pipeline_metadata(product_id=id, status=2))
-        date, review_count = parse_query_result(cursor.fetchall()[0])
+        date, review_count = query_helpers.parse_query_result(cursor.fetchall()[0])
         json_content = aws_helpers.get_json_from_s3(
             bucket=bucket,
             filename='raw/products/' + id + '/' + id + '-' + date + '-reviews.json'

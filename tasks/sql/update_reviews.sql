@@ -1,14 +1,23 @@
-CREATE TABLE IF NOT EXISTS reviews(
-    product_id varchar(12) NOT NULL,
-    review_id varchar(15) NOT NULL,
-    name varchar(100) NOT NULL,
-    rating int NOT NULL,
-    title varchar(100) NOT NULL,
-    location varchar(50) NOT NULL,
-    date char(8) NOT NULL,
-    other varchar(100),
-    verified bit NOT NULL,
-    body varchar(30000),
-    PRIMARY KEY (product_id, review_id)
-);
+CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;
 
+CREATE TEMP TABLE reviews_temp (LIKE reviews);
+
+-- SELECT
+--     aws_s3.table_import_from_s3(
+--         'reviews_temp',
+--         '',
+--         '(format csv, header true)',
+--         '{bucket}',
+--         '{filename}',
+--         '{region}',
+--         '{access_key}',
+--         '{secret_key}'
+--     );
+
+-- INSERT INTO
+--     reviews
+-- SELECT
+--     *
+-- FROM
+--     reviews_temp
+-- ON CONFLICT (product_id, review_id) DO NOTHING;
