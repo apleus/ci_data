@@ -37,11 +37,9 @@ if __name__ == '__main__':
             access_key=access_key,
             secret_key=secret_key
         )
+        reviews_updates += query #+ query_helpers.update_pipeline_metadata_table(id, today, review_count, 4)
 
-        # update pipeline metadata table
-        cursor.execute(query_helpers.update_pipeline_metadata_table(id, today, review_count, 4))
-
-    # cursor.execute(reviews_updates)
+    cursor.execute(reviews_updates)
     conn.commit()
     cursor.close()
     conn.close()

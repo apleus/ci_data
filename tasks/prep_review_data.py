@@ -32,15 +32,15 @@ def sanitize_json(json_content):
     """
     df = pd.DataFrame.from_dict(json_content, orient='columns')
 
-    df['name'] = df['name'].map(lambda x: x.replace('|', ''))
+    df['name'] = df['name'].map(lambda x: x.replace(',', ''))
     df['rating'] = df['rating'].map(lambda x: int(str(x)[0]))
-    df['title'] = df['title'].map(lambda x: x.replace('|', ''))
+    df['title'] = df['title'].map(lambda x: x.replace(',', ''))
     df['location'] = df['location'].map(lambda x: re.sub(r"[^a-zA-Z ]", "", \
                                                             x.split("Reviewed in ")[-1].split("the ")[-1]).strip())
     df['date'] = df['date'].map(lambda x: str(datetime.strptime(x,'%B %d, %Y').strftime("%Y%m%d")))
-    df['other'] = df['other'].map(lambda x: x.replace('|', ''))
+    df['other'] = df['other'].map(lambda x: x.replace(',', ''))
     df['verified'] = df['verified'].map(lambda x: x == "Verified Purchase")
-    df['body'] = df['body'].map(lambda x: x.replace('|', ''))
+    df['body'] = df['body'].map(lambda x: x.replace(',', ''))
     return df
 
 

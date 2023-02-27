@@ -73,7 +73,7 @@ def upload_df_csv_to_s3(bucket, filename, df):
     s3_conn = connect_to_s3()
     tmp = NamedTemporaryFile(mode="w+")
     tmp.flush()
-    df.to_csv(path_or_buf=tmp.name, sep='|')
+    df.to_csv(path_or_buf=tmp.name, sep=',', index=False)
     s3_conn.meta.client.upload_file(Filename=tmp.name, Bucket=bucket, Key=filename)
     tmp.close()
 

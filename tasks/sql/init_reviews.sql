@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS reviews(
     location varchar(50) NOT NULL,
     date char(8) NOT NULL,
     other varchar(100),
-    verified bit NOT NULL,
+    verified boolean NOT NULL,
     body varchar(30000),
     PRIMARY KEY (product_id, review_id)
 );
