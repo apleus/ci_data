@@ -37,18 +37,19 @@ App flow...
 
 TODOS:
 
-refactor...
-- should you update pipeline_metadata instead of adding new entry?
-    - change key to just product_id, date
-
-EVENTUALLY:
 - dbt transformations
 - d3.js
-- Terraform
 - airflow
-- put onto AWS
+- terraform / put everything onto AWS
+- makefile, etc.
+- cleanup -- read entire codebase; organization? init.py? style? logging?
+- documentation
+
+eventually:
 - automate EC2, RDS to stop with action tied to budget alert...
-- logging
+- refactor...
+    - should you update pipeline_metadata instead of adding new entry?
+        - change key to just product_id, date
 
 
 Schema notes:

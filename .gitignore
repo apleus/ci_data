@@ -2,5 +2,6 @@
 venv/
 minio/
 .env
-logs/*
+logs/
 notes.txt
+.DS_Store
