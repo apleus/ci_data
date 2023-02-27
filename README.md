@@ -2,32 +2,41 @@
 
 Misc notes...
 
+1. Standard library imports
+2. - blank line -
+3. google sdk imports
+4. - blank line -
+5. django imports
+6. - blank line -
+7. your own code imports
+
 App flow...
 
 0. Prepare for scrape
 - (manually) specify products to watch in products.txt
-- extract_raw_review_data.py
+- extract_raw_data.py
     - for each product
         - Initialize products, pipeline_metadata tables if necessary
         - Get last review_count to calculate how many product review pages to scrape
         - Update pipeline_metadata to signify raw scrape started
         - Scrape product reviews and upload to s3 as json
         - Update pipeline_metadata to signify raw scrape complete
-- prep_review_data.py
+- extract_prep_data.py
     - for each product
         - find most recent raw data file
         - sanitize review data
         - validate review data
         - Upload sanitized data to s3 as csv
         - Update pipeline_metadata to signify prep complete
-- prep_data_to_rds.py
+- load_prep_data.py
     - for each product
+        - find most recent prep data csv file
+        - insert csv data into rds
+        - update pipeline_metadata to signify load complete
+
 
 TODOS:
 
-
-3. add new reviews to reviews table
-3b. update scrapes table to show completed E, L
 refactor...
 - should you update pipeline_metadata instead of adding new entry?
     - change key to just product_id, date
@@ -39,6 +48,7 @@ EVENTUALLY:
 - airflow
 - put onto AWS
 - automate EC2, RDS to stop with action tied to budget alert...
+- logging
 
 
 Schema notes:
