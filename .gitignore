@@ -10,3 +10,6 @@ notes.txt
 
 # dbt
 tasks/.dbt/
+tasks/transform_dbt/target/
+tasks/transform_dbt/dbt_packages/
+tasks/transform_dbt/logs/

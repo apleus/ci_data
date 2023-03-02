@@ -33,7 +33,10 @@ App flow...
         - find most recent prep data csv file
         - insert csv data into rds
         - update pipeline_metadata to signify load complete
-
+- dbt run
+    - load in src
+    - do staging
+    - create marts
 
 TONIGHT:
 
