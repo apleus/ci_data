@@ -2,7 +2,8 @@ WITH src AS (
     SELECT *
     FROM {{ source('lake', 'reviews') }}
 ), temp as (
-    SELECT product_id,
+    SELECT
+        product_id,
         review_id,
         name,
         rating::INT,

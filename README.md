@@ -50,15 +50,7 @@ integrate w/ airflow using dbt operators
 integrate w/ rds?
 
 dbt transformations:
-- review length vs. star rating
-- rating over time
-    - by location
-- frequency of reviews over time
-    - by location
-- location pie chart
-- most common words
-- most common words associated with 4-5* review
-- most common words associated with 1-2* review
+
 - sentiment analysis body initial transformation (extension)
 - sentiment analysis title initial transformation
 
@@ -98,7 +90,7 @@ Scrapes table:
 PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS
 
 Reviews table:
-PRODUCT_ID | NAME | RATING* | TITLE | LOCATION* | DATE* | OTHER | VERIFIED | BODY*
+PRODUCT_ID | REVIEW_ID | NAME | RATING | TITLE | LOCATION | DATE | OTHER | VERIFIED | BODY
 
 extenion:
 
