@@ -41,9 +41,7 @@ App flow...
 TONIGHT:
 
 dbt:
-- marts / views sql + schema files
 - script to generate profile .yml
-- any additional tests?
 CLEANUP / STYLE
 
 integrate w/ airflow using dbt operators

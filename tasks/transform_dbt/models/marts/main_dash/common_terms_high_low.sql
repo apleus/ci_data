@@ -14,7 +14,7 @@ FROM (
         ELSE 'mid'
     END AS high_low, 
     LOWER(unnest(regexp_matches(body, '(\w{4,})', 'g'))) AS word
-  FROM lake.reviews
+  FROM {{ ref('stg__reviews') }}
 ) word_counts_table
 WHERE word NOT IN (
     'coffee','machine','nespresso','keurig',
