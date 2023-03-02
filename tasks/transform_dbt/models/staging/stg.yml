@@ -1,0 +1,6 @@
+version: 2
+
+# all relevant generic tests taken care of in src.yml
+models:
+  - name: stg__reviews
+  - name: stg__products

@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from pathlib import Path
 import re
 from typing import List
 
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     - validate w/ pydantic
     - upload as prep data csv
     """
-    load_dotenv(dotenv_path='../.env')
+    load_dotenv(dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env')
     bucket = os.environ['AWS_BUCKET_REVIEWS']
     today = datetime.today().strftime('%Y%m%d')
     product_ids = queries.get_product_list()
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     for id in product_ids:
 
         # get most recent raw reviews json data
-        cursor.execute(queries.get_pipeline_metadata(product_id=id, status=2))
+        cursor.execute(queries.get_pipeline_metadata(product_id=id, status=1))
         date, review_count = queries.parse_query_result(cursor.fetchall()[0])
         json_content = aws.get_json_from_s3(
             bucket=bucket,
@@ -99,7 +100,7 @@ if __name__ == "__main__":
         )
 
         # craft query to update pipeline_metadata
-        pipeline_metadata_updates += queries.update_pipeline_metadata_table(id, today, review_count, 3)
+        pipeline_metadata_updates += queries.update_pipeline_metadata_table(id, today, review_count, 2)
     
     # execute all relevant updates to pipeline_metadata table
     cursor.execute(pipeline_metadata_updates)

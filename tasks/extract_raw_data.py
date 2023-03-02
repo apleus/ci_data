@@ -1,6 +1,7 @@
 from datetime import datetime
 import math
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -60,12 +61,12 @@ def scrape_new_reviews(product_id, date, past_review_count):
 
     # craft and return queries to update products + pipeline_metadata tables
     products_update = queries.update_products_table(product_id, brand, title)
-    pipeline_metadata_update = queries.update_pipeline_metadata_table(product_id, date, review_count, 2)
+    pipeline_metadata_update = queries.update_pipeline_metadata_table(product_id, date, review_count, 1)
     return products_update + pipeline_metadata_update
 
 
 if __name__ == "__main__":
-    load_dotenv(dotenv_path='../.env')
+    load_dotenv(dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env')
 
     # get list of products to track
     product_ids = queries.get_product_list()
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     for product_id in product_ids:
 
         # get last review count from pipeline_metadata table and use it to calculate number of pages to scrape
-        cursor.execute(queries.get_pipeline_metadata(product_id=product_id, status=4))
+        cursor.execute(queries.get_pipeline_metadata(product_id=product_id, status=3))
         query_response = cursor.fetchall()
         past_review_count = 0 if query_response == [] else query_response[0][1]
 

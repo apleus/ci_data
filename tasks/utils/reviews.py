@@ -5,7 +5,7 @@ import random
 
 from requests_html import HTMLSession
 
-import user_agents
+import utils.user_agents as user_agents
 
 """
 Class defining a review scraper for a single product on Amazon marketplace

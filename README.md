@@ -35,14 +35,48 @@ App flow...
         - update pipeline_metadata to signify load complete
 
 
+TONIGHT:
+
+dbt:
+- marts / views sql + schema files
+- script to generate profile .yml
+- any additional tests?
+CLEANUP / STYLE
+
+integrate w/ airflow using dbt operators
+integrate w/ rds?
+
+dbt transformations:
+- review length vs. star rating
+- rating over time
+    - by location
+- frequency of reviews over time
+    - by location
+- location pie chart
+- most common words
+- most common words associated with 4-5* review
+- most common words associated with 1-2* review
+- sentiment analysis body initial transformation (extension)
+- sentiment analysis title initial transformation
+
+
+- SCD2 (slowly changing dimension type 2)
+    - products table?
+    - change date to datetime completed in pipeline table
+
+
 TODOS:
 
 - dbt transformations
 - d3.js
-- airflow
+- make sure everythihng working in airflow / docker
 - terraform / put everything onto AWS
+    - created RDS schema manually
 - makefile, etc.
 - cleanup -- read entire codebase; organization? init.py? style? logging?
+    sql queries
+    filepaths
+    
 - documentation
 
 eventually:
@@ -58,15 +92,27 @@ Products table:
 PRODUCT_ID | BRAND | PRODUCT TITLE
 
 Scrapes table:
-PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS (init, raw, prep, transform)
+PRODUCT_ID | DATE SCRAPED | REVIEW COUNT | STATUS
 
 Reviews table:
-PRODUCT_ID | NAME | RATING | TITLE | LOCATION | DATE | OTHER | VERIFIED | BODY
+PRODUCT_ID | NAME | RATING* | TITLE | LOCATION* | DATE* | OTHER | VERIFIED | BODY*
 
 extenion:
 
 Images table:
 PRODUCT_ID | IMAGE1_LINK | ...
+
+
+docker file structure:
+
+airflow/
+    dags/
+    tasks/
+        rds_sql/
+        utils/
+        (tasks).py
+        products.txt
+    .env
 
 
 Opportunities for extensions:

@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS aws_s3 CASCADE;
 
-CREATE TEMP TABLE reviews_temp (LIKE reviews);
+CREATE TEMP TABLE reviews_temp (LIKE lake.reviews);
 
 SELECT
     aws_s3.table_import_from_s3(
@@ -15,7 +15,7 @@ SELECT
     );
 
 INSERT INTO
-    reviews
+    lake.reviews
 SELECT
     *
 FROM

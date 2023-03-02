@@ -1,7 +1,12 @@
-# Environments
+# env
 venv/
-minio/
 .env
+
+# logs and other files
 logs/
-notes.txt
+minio/
 .DS_Store
+notes.txt
+
+# dbt
+tasks/.dbt/

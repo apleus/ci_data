@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS reviews(
+CREATE TABLE IF NOT EXISTS lake.reviews(
     product_id varchar(12) NOT NULL,
     review_id varchar(15) NOT NULL,
     name varchar(100) NOT NULL,

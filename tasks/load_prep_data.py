@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -10,7 +11,7 @@ LOAD: Loads sanitized prep data from s3 into RDS reviews table
 """
 
 if __name__ == '__main__':
-    load_dotenv(dotenv_path='../.env')
+    load_dotenv(dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env')
     
     today = datetime.today().strftime('%Y%m%d')
     product_ids = queries.get_product_list()
@@ -23,13 +24,13 @@ if __name__ == '__main__':
     for id in product_ids:
 
         # get most recent prep data file
-        cursor.execute(queries.get_pipeline_metadata(product_id=id, status=3))
+        cursor.execute(queries.get_pipeline_metadata(product_id=id, status=2))
         date, review_count = queries.parse_query_result(cursor.fetchall()[0])
         prep_filename = 'prep/products/' + id + '/' + id + '-' + date + '-reviews.csv'
   
         # generate queries to update reviews table and pipeline_metadata
         review_update = queries.update_reviews_table(prep_filename)
-        pm_update = queries.update_pipeline_metadata_table(id, today, review_count, 4)
+        pm_update = queries.update_pipeline_metadata_table(id, today, review_count, 3)
         
         updates += review_update + pm_update
 

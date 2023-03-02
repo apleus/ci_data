@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: lake
+    description: Data from EL
+    tables:
+      - name: reviews
+        columns:
+        - name: product_id
+          tests:
+            - not_null
+        - name: review_id
+          tests:
+            - not_null
+        - name: rating
+          tests:
+            - accepted_values:
+                values: [1, 2, 3, 4, 5]
+        - name: date
+          tests:
+            - not_null
+      - name: products
+        columns:
+        - name: product_id
+          tests:
+            - not_null

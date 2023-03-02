@@ -1,23 +1,27 @@
 import os
+from pathlib import Path
 
 from pydantic import ValidationError
 
-from models import ProductModel, PipelineMetadataModel
+from utils.models import ProductModel, PipelineMetadataModel
 
 """
 Helper fns to generate queries for products, pipeline_metadata, reviews tables
 """
 
+query_path = str(Path(__file__).parent.parent.resolve()) + '/rds_sql/'
+
+
 def get_product_list():
     """
     Get list of product ids to track
-    TODO EXTENSION: create more systematic way for scraping relevant product IDs
+    TODO EXTENSION: create more systematic way of scraping relevant product IDs
 
     Returns:
         product_ids (list): list of strings of product IDs
     """
     product_ids = []
-    with open('products.txt') as f:
+    with open(str(Path(__file__).parent.parent.resolve()) + '/products.txt') as f:
         product_ids = [line.rstrip() for line in f]
     return product_ids
 
@@ -30,7 +34,7 @@ def init_products_table():
     Returns:
         query: SQL query string
     """
-    query_file = open('./sql/init_products.sql', 'r')
+    query_file = open(query_path + 'init_products.sql', 'r')
     query = query_file.read()
     return query
 
@@ -65,7 +69,7 @@ def update_products_table(product_id, brand, title):
         print(e)
 
     # create query to update products table
-    query_file = open('./sql/update_products.sql', 'r')
+    query_file = open(query_path + 'update_products.sql', 'r')
     query = query_file.read()
     query = query.format(
         product_id=product_id,
@@ -85,7 +89,7 @@ def init_pipeline_metadata_table():
     """
 
     # create query to update pipeline_metadata table
-    query_file = open('./sql/init_pipeline_metadata.sql', 'r')
+    query_file = open(query_path + 'init_pipeline_metadata.sql', 'r')
     query = query_file.read()
     return query
 
@@ -97,14 +101,13 @@ def get_pipeline_metadata(product_id, status):
 
     Args:
         product_id (str): unique ID of product
-        status (int): 1=extract initialized, 2=extract completed,
-                    3=prep completed, 4=uploaded to RDS
+        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS
     Returns:
         query: extracts latest review_count for product
     """
 
     # create query to update pipeline_metadata table
-    query_file = open('./sql/get_pipeline_metadata.sql', 'r')
+    query_file = open(query_path + 'get_pipeline_metadata.sql', 'r')
     query = query_file.read()
     query = query.format(
         product_id=product_id,
@@ -122,8 +125,7 @@ def update_pipeline_metadata_table(product_id, date, review_count, status):
         product_id (str): unique product ID
         date (str): YYYYMMDD
         review_count (int): number of reviews on product
-        status (int): 1=extract initialized, 2=extract completed,
-                    3=prep completed, 4=uploaded to RDS
+        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS
     Returns:
         Query: query that updates pipeline_metadata with new data
     """
@@ -142,7 +144,7 @@ def update_pipeline_metadata_table(product_id, date, review_count, status):
         print(e)
 
     # create query to update pipeline_metadata table
-    query_file = open('./sql/update_pipeline_metadata.sql', 'r')
+    query_file = open(query_path + 'update_pipeline_metadata.sql', 'r')
     query = query_file.read()
     query = query.format(
         product_id=product_id,
@@ -161,7 +163,7 @@ def init_reviews_table():
     Returns:
         query: SQL query string
     """
-    query_file = open('./sql/init_reviews.sql', 'r')
+    query_file = open(query_path + 'init_reviews.sql', 'r')
     query = query_file.read()
     return query
 
@@ -175,7 +177,7 @@ def update_reviews_table(filename):
     Returns:
         query: query that updates reviews table with new data
     """
-    query_file = open('./sql/update_reviews.sql', 'r')
+    query_file = open(query_path + 'update_reviews.sql', 'r')
     query = query_file.read()
     query = query.format(
         bucket=os.environ['AWS_BUCKET_REVIEWS'],
