@@ -1,3 +1,9 @@
-INSERT INTO lake.products (product_id, brand, title)
-    VALUES ('{product_id}', '{brand}', '{title}')
-ON CONFLICT (product_id) DO NOTHING;
+INSERT INTO lake.products (
+    product_id,
+    brand,
+    title
+) VALUES (
+    '{product_id}', 
+    '{brand}',
+    '{title}'
+) ON CONFLICT (product_id) DO NOTHING;

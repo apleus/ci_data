@@ -38,31 +38,15 @@ App flow...
     - do staging
     - create marts
 
-TONIGHT:
 
-dbt:
-- script to generate profile .yml
-CLEANUP / STYLE
-
-integrate w/ airflow using dbt operators
-integrate w/ rds?
-
-dbt transformations:
-
-- sentiment analysis body initial transformation (extension)
-- sentiment analysis title initial transformation
-
-
-- SCD2 (slowly changing dimension type 2)
-    - products table?
-    - change date to datetime completed in pipeline table
+TODAY:
+- integrate w/ airflow using dbt operators
+- d3.js
+- make sure everythihng working in airflow / docker
 
 
 TODOS:
 
-- dbt transformations
-- d3.js
-- make sure everythihng working in airflow / docker
 - terraform / put everything onto AWS
     - created RDS schema manually
 - makefile, etc.
@@ -111,7 +95,15 @@ airflow/
 Opportunities for extensions:
 
 add stage at the front of the pipeline to scrape and aggregate product ids. deeper analyses across more products
+dbt transformations:
 
+- sentiment analysis body initial transformation (extension)
+- sentiment analysis title initial transformation
+
+
+- SCD2 (slowly changing dimension type 2)
+    - products table?
+    - change date to datetime completed in pipeline table
 
 Products:
 
