@@ -51,6 +51,10 @@ class Reviews:
         """
         temp_loc_date = r.xpath('//span[@data-hook="review-date"]', first=True).text
         location, date = temp_loc_date.split(" on ")
+
+        # TODO (extension): find elegant way of breaking loop to allow for foreign reviews
+        if "United States" not in location: return None
+
         other = ''
         try:
             other = r.xpath('//a[@data-hook="format-strip"]', first=True).text
@@ -89,11 +93,12 @@ class Reviews:
         """
         reviews = []
         for i in range(1, page_num + 1):
+            # print(f"Scraping page {i}...")
             page_of_review_elements = self.get_page(i)
             if page_of_review_elements is not False:
                 for r in page_of_review_elements:
                     review_json = self.parse_single_review(r)
-                    reviews.append(review_json)
+                    if review_json: reviews.append(review_json)
                 logging.info(f'Scraped page {i}...')
             else:
                 logging.info('End of reviews...')

@@ -27,7 +27,7 @@ def calc_pages_to_scrape(review_count, past_review_count, reviews_per_page=10):
         page_num (int): number of pages of reviews to scrape
     """
     page_num = math.ceil(float(review_count - past_review_count)/reviews_per_page)
-    page_num = 1 # TEMP VALUE FOR TESTING
+    # page_num = 1 # TEMP VALUE FOR TESTING
     return page_num
 
 

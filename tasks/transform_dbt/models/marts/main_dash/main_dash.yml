@@ -12,17 +12,7 @@ models:
       - name: product_id
         tests:
           - not_null
-  - name: ratings_over_time
-    columns:
-      - name: product_id
-        tests:
-          - not_null
   - name: ratings_over_time_avg
-    columns:
-      - name: product_id
-        tests:
-          - not_null
-  - name: ratings_over_time_count
     columns:
       - name: product_id
         tests:
@@ -33,6 +23,11 @@ models:
         tests:
           - not_null
   - name: reviews_by_location
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+  - name: products_count
     columns:
       - name: product_id
         tests:

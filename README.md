@@ -39,9 +39,19 @@ App flow...
     - create marts
 
 
+views:
+- (table) product name, brand, count
+- (number) total reviews scraped
+- (line) weekly average rating by product (can do average in view)
+- (pie) review locations for each product
+- (bar) common pos/neg terms for each product (Word Frequency vs Words)
+- (bar) avg review length vs. rating
+- description
+
 TODAY:
-- integrate w/ airflow using dbt operators
-- d3.js
+- debug
+    
+- integrate everything w/ airflow, dbt operators
 - make sure everythihng working in airflow / docker
 
 
@@ -49,10 +59,9 @@ TODOS:
 
 - terraform / put everything onto AWS
     - created RDS schema manually
+    - added data source and charts to superset manually
 - makefile, etc.
 - cleanup -- read entire codebase; organization? init.py? style? logging?
-    sql queries
-    filepaths
     
 - documentation
 
