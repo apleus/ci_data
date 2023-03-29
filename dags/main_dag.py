@@ -1,8 +1,7 @@
 from datetime import datetime, date, timedelta
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.providers.amazon.aws.sensors.s3_key import S3KeySensor
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow_dbt.operators.dbt_operator import DbtRunOperator, DbtTestOperator
 
 default_args = {
     'owner': 'apleus',
@@ -16,8 +15,21 @@ with DAG (
     start_date = datetime(2023, 14, 1),
     schedule_interval = '@daily'
 ) as dag:
-    scrape_product_reviews = BashOperator(
-        task_id='scrape_product_reviews',
-        bash_command='/opt/airflow/tasks/scrape_product_reviews.py'
+    extract_raw_data = BashOperator(
+        task_id='extract1',
+        bash_command='/opt/airflow/tasks/extract_raw_data.py'
     )
-    scrape_product_reviews
+    extract_prep_data = BashOperator(
+        task_id='extract2',
+        bash_command='/opt/airflow/tasks/extract_prep_data.py'
+    )
+    load_prep_data = BashOperator(
+        task_id='load1',
+        bash_command='/opt/airflow/tasks/load_prep_data.py'
+    )
+
+(
+    extract_raw_data
+    >> extract_prep_data
+    >> load_prep_data
+)

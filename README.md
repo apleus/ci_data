@@ -1,10 +1,6 @@
-# ci_data
+# End-To-End ELT Pipeline for Customer Intelligence
 
-End-to-end automated ELT pipeline that scrapes product reviews and metadata for competing Amazon products daily, then validates, transforms, and summarizes data in a dashboard.
-
-## Dashboard
-
-TODO: insert dashboard image
+Automated pipeline that scrapes product reviews and metadata for competing Amazon products daily, then validates, transforms, and summarizes data in a dashboard.
 
 ## Pipeline Architecture
 
@@ -24,33 +20,17 @@ Infrastructure also includes:
 
 ## Requirements
 
+1. Docker / Docker-Compose
+2. AWS CLI
+
 ## Setup
 
+1. `sh build.sh`: Creates extended Airflow Docker image, builds and runs Docker container, runs pipeline.
+2. `sh shutdown.sh`: Shuts down pipeline and Docker containers.
 
+## TODOS
 
--- Other TODOs --
-
-TODAY:
-- fix simple style wins, mark more difficult as "TODO"
-- integrate everything w/ airflow, dbt operators
-- fix dashboard
-- arch diagram
-- make sure everythihng working in airflow / docker
-
-NEXT:
-- terraform / put everything onto AWS
-    - created RDS schema manually
-    - added data source and charts to superset manually
-- makefile, etc.
-- cleanup -- read entire codebase; organization? init.py? style? logging?
-- documentation
-- automate EC2, RDS to stop with action tied to budget alert...
-- refactor...
-    - should you update pipeline_metadata instead of adding new entry?
-        - change key to just product_id, date
-
-OPPORTUNITIES FOR EXTENSIONS:
-- aggregate more product ids for deeper analyses across more products
-- NLP / sentiment analysis on review text
-- Change dimension tables to SCD2 (e.g. products table)
-
+0. Refactoring
+1. Tweak dashboard views
+2. Terraform for infra provisioning
+3. Makefile for easy setup

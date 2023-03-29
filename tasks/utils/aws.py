@@ -1,6 +1,7 @@
 import json
 import os
 from tempfile import NamedTemporaryFile
+from contextlib import contextmanager
 
 import pandas as pd
 
@@ -11,23 +12,42 @@ from psycopg2 import InterfaceError, DatabaseError
 
 """Connections, uploads, and downloads from AWS S3 + RDS."""
 
-def connect_to_rds():
-    """Connect to RDS Resource using psycopg2.
 
-    Returns:
-        rds_conn: RDS connection.
+class RDSConnection:
+    """Connection to RDS database.
+    
+    Attributes:
+        host (str): db host.
+        port (str): db port.
+        user (str): db username.
+        password (str): db password.
     """
-    # TODO(): refactor as context manager to manage conn
-    try:
+    def __init__(self):
+        self.host = os.environ['RDS_HOST']
+        self.port = os.environ['RDS_PORT']
+        self.user = os.environ['RDS_USER']
+        self.password = os.environ['RDS_PW']
+    
+    @contextmanager
+    def managed_cursor(self):
+        """Fuction to create a managed database cursor.
+
+        Yields:
+            cur: cursor for RDS PostgreSQL db.
+        """
         rds_conn = psycopg2.connect(
-            host=os.environ['RDS_HOST'],
-            port=os.environ['RDS_PORT'],
-            user=os.environ['RDS_USER'],
-            password=os.environ['RDS_PW']
+            host=self.host,
+            port=self.port,
+            user=self.user,
+            password=self.password
         )
-        return rds_conn
-    except (InterfaceError, DatabaseError) as e:
-        raise (e)
+        cur = rds_conn.cursor()
+        try:
+            yield cur
+        finally:
+            rds_conn.commit()
+            cur.close()
+            rds_conn.close()
 
 
 def connect_to_s3():

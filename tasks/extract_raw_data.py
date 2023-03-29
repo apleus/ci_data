@@ -28,61 +28,66 @@ def calc_pages_to_scrape(review_count, past_review_count, reviews_per_page=10):
     return page_num
 
 
-def scrape_new_reviews(id, date, past_review_count):
-    """Scrapes net new reviews of given amazon product.
+def scrape_new_data(id, past_review_count):
+    """Scrapes net new reviews and metadata of given amazon product.
 
     Args:
         id (str): unique amazon product ID
-        date (str): YYYYMMDD date of scrape
         past_review_count (int): most recent past review count
     Returns:
-        query string that updates data in pipeline_metadata and products tables
+        brand (str): Product brand as listed on Amazon.
+        title (str): Title of product as listed on Amazon.
+        review_count (int): Number of reviews for product.
+        reviews (list): List of dicts of reviews.
     """
-
     amazon_product = Reviews(id)
-
     brand, title, rc = amazon_product.get_product_info()
     review_count = int(
         rc.split('total ratings, ')[-1].split(' with reviews')[0].replace(',',''))
     page_num = calc_pages_to_scrape(review_count, past_review_count)
-
     reviews = amazon_product.parse_pages(page_num)
-    aws.upload_json_to_s3(
-        bucket=os.environ['AWS_BUCKET_REVIEWS'],
-        filename=f'raw/products/{id}/{id}-{date}-reviews.json',
-        data=reviews
-        )
+    return brand, title, review_count, reviews
 
-    products_update = queries.update_products_table(id, brand, title)
-    metadata_update = queries.update_pipeline_metadata_table(id, date, review_count, 1)
-    return products_update + metadata_update
+
+def get_past_review_counts(db, ids):
+    """Gets most recent past review count for each product ID.
+
+    Args:
+        db (RDSConnection): connection to RDS db.
+        ids (list): List of product IDs.
+    Returns:
+        past_counts (list): List of [id, review_count] lists.
+    """
+    past_counts = []
+    with db.managed_cursor() as cur:
+        cur.execute(queries.init_products_table() + queries.init_pipeline_metadata_table())  
+        for id in ids:
+            cur.execute(queries.get_pipeline_metadata(id, 3))
+            query_response = cur.fetchall()
+            past_review_count = 0 if query_response == [] else query_response[0][1]
+            past_counts.append([id, past_review_count])
+    return past_counts
 
 
 if __name__ == "__main__":
 
-    dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env'
-    load_dotenv(dotenv_path)
+    load_dotenv(str(Path(__file__).parent.parent.resolve()) + '/.env')
     today = datetime.today().strftime('%Y%m%d')
     product_ids = queries.get_product_list()
+    db = aws.RDSConnection()
+    past_counts = get_past_review_counts(db, product_ids)
 
-    # TODO: refactor as context manager to manage conn
-    conn = aws.connect_to_rds()
-    cursor = conn.cursor()
-    cursor.execute(
-        queries.init_products_table() + queries.init_pipeline_metadata_table())
     db_updates = []
+    for id, past_review_count in past_counts:
+        brand, title, review_count, reviews = scrape_new_data(id, past_review_count)
+        aws.upload_json_to_s3(
+            bucket=os.environ['AWS_BUCKET_REVIEWS'],
+            filename=f'raw/products/{id}/{id}-{today}-reviews.json',
+            data=reviews
+        )
+        products_update = queries.update_products_table(id, brand, title)
+        metadata_update = queries.update_pipeline_metadata_table(id, today, review_count, 1)
+        db_updates.append(products_update + metadata_update)
 
-    for product_id in product_ids:
-
-        # get last review count from pipeline_metadata to calc # pages to scrape
-        cursor.execute(queries.get_pipeline_metadata(product_id, 3))
-        query_response = cursor.fetchall()
-        past_review_count = 0 if query_response == [] else query_response[0][1]
-        query = scrape_new_reviews(product_id, today, past_review_count)
-        db_updates.append(query)
-    
-    all_updates = ''.join(db_updates)
-    cursor.execute(all_updates)
-    conn.commit()
-    cursor.close()
-    conn.close()
+    with db.managed_cursor() as cur:
+        cur.execute(''.join(db_updates))
