@@ -16,7 +16,6 @@ Pipeline flow:
 Infrastructure also includes:
 - Orchestration via Airflow
 - Containerization via Docker
-- Dashboard via Apache Superset
 
 ## Requirements
 
