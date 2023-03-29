@@ -9,10 +9,9 @@ user_agents = [
 ]
 
 def get_ua():
-    """
-    To circumvent bot detection, scramble User Agent in html header
+    """To circumvent bot detection, scramble User Agent in html header.
 
     Returns:
-    random user agent from the user_agents list
+        Random User Agent from user_agents list.
     """
     return random.choice(user_agents)

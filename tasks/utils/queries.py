@@ -1,76 +1,52 @@
 import os
 from pathlib import Path
 
-from pydantic import ValidationError
-
-from utils.models import ProductModel, PipelineMetadataModel
-
-"""
-Helper fns to generate queries for products, pipeline_metadata, reviews tables
-"""
+"""Helper functions to generate queries from raw SQL and parse data."""
 
 query_path = str(Path(__file__).parent.parent.resolve()) + '/rds_sql/'
 
 
 def get_product_list():
-    """
-    Get list of product ids to track
-    TODO EXTENSION: create more systematic way of scraping relevant product IDs
+    """Retrieves list of Amazon product IDs to track.
 
     Returns:
-        product_ids (list): list of strings of product IDs
+        product_ids (list): List of strings of product IDs.
     """
     product_ids = []
-    with open(str(Path(__file__).parent.parent.resolve()) + '/products.txt') as f:
+    filename = str(Path(__file__).parent.parent.resolve()) + '/products.txt'
+    with open(filename) as f:
         product_ids = [line.rstrip() for line in f]
     return product_ids
 
 
 def init_products_table():
-    """
-    Generate query that initalizes products table if it
-    doesn't exist
+    """Query that initalizes products table if not exists.
 
     Returns:
-        query: SQL query string
+        query: SQL query string.
     """
-    query_file = open(query_path + 'init_products.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'init_products.sql', 'r') as f:
+        query = f.read()
     return query
 
 
 def update_products_table(product_id, brand, title):
-    """
-    Sanitizes and validates product data and crafts query
-    to update products table with new product data
+    """Query to update products table with new product metadata.
 
     Args:
-        product_id (str): unique product ID
-        brand (str): product brand as listed on amazon
-        title (str): title of product as listed on amazon
+        product_id (str): Unique product ID.
+        brand (str): Product brand as listed on Amazon.
+        title (str): Title of product as listed on Amazon.
     Returns:
         query: adds product data to products table if necessary
     """
-
-    # sanitize product data
     brand = brand.replace("'", "")
     title = title.replace("'", "")
 
-    # validate product data
-    product = {
-            'product_id': product_id,
-            'brand': brand,
-            'title': title
-    }
-    try:
-        product_model = ProductModel(**product)
-    except ValidationError as e:
-        print("Pydantic Validation Error...")
-        print(e)
-
-    # create query to update products table
-    query_file = open(query_path + 'update_products.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'update_products.sql', 'r') as f:
+        query = f.read()
     query = query.format(
         product_id=product_id,
         brand=brand,
@@ -80,35 +56,29 @@ def update_products_table(product_id, brand, title):
 
 
 def init_pipeline_metadata_table():
-    """
-    Generate query that initalizes pipeline_metadata table if it
-    doesn't exist
+    """Query to initalize pipeline_metadata table if not exists.
 
     Returns:
-        query: SQL query string
+        query: SQL query string.
     """
-
-    # create query to update pipeline_metadata table
-    query_file = open(query_path + 'init_pipeline_metadata.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'init_pipeline_metadata.sql', 'r') as f:
+        query = f.read()
     return query
 
 
 def get_pipeline_metadata(product_id, status):
-    """
-    Extract latest date, review_count for specific product_id & status
-    from pipeline_metadata
+    """Query to get latest date, review count from pipeline_metadata table.
 
     Args:
-        product_id (str): unique ID of product
-        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS
+        product_id (str): unique ID of product.
+        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS.
     Returns:
-        query: extracts latest review_count for product
+        query: Extracts latest review_count for product.
     """
-
-    # create query to update pipeline_metadata table
-    query_file = open(query_path + 'get_pipeline_metadata.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'get_pipeline_metadata.sql', 'r') as f:
+        query = f.read()
     query = query.format(
         product_id=product_id,
         status=status
@@ -117,35 +87,19 @@ def get_pipeline_metadata(product_id, status):
 
 
 def update_pipeline_metadata_table(product_id, date, review_count, status):
-    """
-    Validates pipeline metadata and crafts query to update
-    pipeline_metadata table with new data
+    """Query to update pipeline_metadata table with new data.
 
     Args:
-        product_id (str): unique product ID
-        date (str): YYYYMMDD
-        review_count (int): number of reviews on product
-        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS
+        product_id (str): Unique product ID.
+        date (str): "YYYYMMDD".
+        review_count (int): Number of reviews for product.
+        status (int): 1=raw extracted, 2=prep done, 3=loaded into RDS.
     Returns:
-        Query: query that updates pipeline_metadata with new data
+        query: Updates pipeline_metadata with new data.
     """
-    
-    # validate pipeline metadata
-    pipeline_metadata = {
-        'product_id': product_id,
-        'date': date,
-        'review_count': review_count,
-        'status': status
-    }
-    try:
-        pipeline_metadata_model = PipelineMetadataModel(**pipeline_metadata)
-    except ValidationError as e:
-        print("Pydantic Validation Error...")
-        print(e)
-
-    # create query to update pipeline_metadata table
-    query_file = open(query_path + 'update_pipeline_metadata.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'update_pipeline_metadata.sql', 'r') as f:
+        query = f.read()
     query = query.format(
         product_id=product_id,
         date=date,
@@ -156,29 +110,28 @@ def update_pipeline_metadata_table(product_id, date, review_count, status):
 
 
 def init_reviews_table():
-    """
-    Generate query that initalizes products table if it
-    doesn't exist
+    """Query that initalizes products table if not exists.
 
     Returns:
-        query: SQL query string
+        query: SQL query string.
     """
-    query_file = open(query_path + 'init_reviews.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'init_reviews.sql', 'r') as f:
+        query = f.read()
     return query
 
 
 def update_reviews_table(filename):
-    """
-    Crafts query to update reviews table with sanitized [filename].csv data
+    """Query to update reviews table with [filename].csv data.
 
     Args:
-        filename (str): file path in s3
+        filename (str): Filepath to sanitized S3 reviews data.
     Returns:
-        query: query that updates reviews table with new data
+        query: Updates reviews table with new data.
     """
-    query_file = open(query_path + 'update_reviews.sql', 'r')
-    query = query_file.read()
+    query = ""
+    with open(query_path + 'update_reviews.sql', 'r') as f:
+        query = f.read()
     query = query.format(
         bucket=os.environ['AWS_BUCKET_REVIEWS'],
         filename=filename,
@@ -190,15 +143,13 @@ def update_reviews_table(filename):
 
 
 def parse_query_result(query_result):
-    """
-    Use result of sql query to get most recent raw
+    """Use result of sql query to get most recent review count.
 
     Args:
-        query_result (tuple): presumably (date, review_count)
+        query_result (tuple): Presumably (date, review_count).
     Returns:
-        date (str): date of most recent raw file
-        review_count (int): number of total reviews
-            when most recent raw file was scraped
+        date (str): Date of most recent pipeline run.
+        review_count (int): Total # reviews after most recent pipeline run.
     """
     date, review_count = ['', 0]
     try:

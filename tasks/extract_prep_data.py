@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import pandas as pd
 from pydantic import ValidationError
 
-import utils.aws_s3_rds as aws
+import utils.aws as aws
 from utils.models import ReviewModel
 import utils.queries as queries
 
@@ -55,57 +55,45 @@ def validate_df(df):
         df (dataframe): santizied review data
     """
     try:
-        reviews: List[ReviewModel] = [ReviewModel(**review) for review in df.to_dict('records')]
+        reviews: List[ReviewModel] = [ReviewModel(**review) for 
+                                      review in df.to_dict('records')]
     except ValidationError as e:
         print("Pydantic Validation Error...")
         print(e)
 
 
 if __name__ == "__main__":
-    """
-    For each new raw reviews file:
-    - sanitize data
-    - validate w/ pydantic
-    - upload as prep data csv
-    """
-    load_dotenv(dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env')
+
+    dotenv_path=str(Path(__file__).parent.parent.resolve()) + '/.env'
+    load_dotenv(dotenv_path)
     bucket = os.environ['AWS_BUCKET_REVIEWS']
     today = datetime.today().strftime('%Y%m%d')
     product_ids = queries.get_product_list()
 
-    # connect to rds
+    # TODO: refactor as context manager to manage conn
     conn = aws.connect_to_rds()
     cursor = conn.cursor()
+    pipeline_metadata_updates = []
 
-    pipeline_metadata_updates = ""
     for id in product_ids:
-
-        # get most recent raw reviews json data
-        cursor.execute(queries.get_pipeline_metadata(product_id=id, status=1))
+        cursor.execute(queries.get_pipeline_metadata(id, 1))
         date, review_count = queries.parse_query_result(cursor.fetchall()[0])
         json_content = aws.get_json_from_s3(
             bucket=bucket,
-            filename='raw/products/' + id + '/' + id + '-' + date + '-reviews.json'
+            filename=f'raw/products/{id}/{id}-{date}-reviews.json'
         )
-
-        # sanitize & validate data
         df = sanitize_json(json_content)
         validate_df(df)
-
-        # upload sanitized and validated data as csv
         aws.upload_df_csv_to_s3(
             bucket=bucket,
-            filename='prep/products/' + id + '/' + id + '-' + today + '-reviews.csv',
+            filename=f'prep/products/{id}/{id}-{today}-reviews.csv',
             df=df
         )
-
-        # craft query to update pipeline_metadata
-        pipeline_metadata_updates += queries.update_pipeline_metadata_table(id, today, review_count, 2)
+        pipeline_metadata_updates.append(
+            queries.update_pipeline_metadata_table(id, today, review_count, 2))
     
-    # execute all relevant updates to pipeline_metadata table
-    cursor.execute(pipeline_metadata_updates)
-    
-    # clean up rds connection
+    all_updates = ''.join(pipeline_metadata_updates)
+    cursor.execute(all_updates)
     conn.commit()
     cursor.close()
     conn.close()
