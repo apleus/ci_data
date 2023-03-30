@@ -1,4 +1,4 @@
-# End-To-End ELT Pipeline for Customer Intelligence
+# ELT Pipeline for Customer Intelligence
 
 Automated pipeline that scrapes product reviews and metadata for competing Amazon products daily, then validates, transforms, and summarizes data in a dashboard.
 
