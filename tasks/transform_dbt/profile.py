@@ -29,5 +29,5 @@ if __name__ == "__main__":
         )
     )
 
-    with open(str(Path.home()) + "/.dbt/profiles.yml", "w") as f:
+    with open(str(Path(__file__).parent.resolve()) + "/profiles.yml", "w") as f:
         yaml.dump(profiles, f, default_flow_style=False)

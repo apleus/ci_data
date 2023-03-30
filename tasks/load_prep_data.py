@@ -38,7 +38,7 @@ if __name__ == '__main__':
     prep_metadata = get_past_metadata(db, product_ids)
 
     db_updates = []
-    for id, date, review_count in product_ids:
+    for id, date, review_count in prep_metadata:
         prep_filename = f'prep/products/{id}/{id}-{date}-reviews.csv'
         review_update = queries.update_reviews_table(prep_filename)
         pm_update = queries.update_pipeline_metadata_table(id, today, review_count, 3)
