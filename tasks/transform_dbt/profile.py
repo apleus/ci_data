@@ -4,9 +4,7 @@ import yaml
 
 from dotenv import load_dotenv
 
-"""
-Generate profiles.yml file for dbt project based on .env vars
-"""
+"""Generate profiles.yml file for dbt project based on .env vars."""
 
 if __name__ == "__main__":
     load_dotenv(dotenv_path=str(Path(__file__).parent.parent.parent.resolve()) + '/.env')

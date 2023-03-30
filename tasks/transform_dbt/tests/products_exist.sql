@@ -1,5 +1,5 @@
--- for every product ID from reviews there must be a corresponding product
--- in the products table
+-- For every product ID from reviews, there must be a corresponding product
+-- in the products table.
 
 SELECT *
 FROM (

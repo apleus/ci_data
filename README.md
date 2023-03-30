@@ -29,7 +29,6 @@ Infrastructure also includes:
 
 ## TODOS
 
-0. Refactoring
-1. Tweak dashboard views
-2. Terraform for infra provisioning
-3. Makefile for ease of use
+1. Refactor dbt SQL
+2. Tweak dashboard views
+3. Terraform for infra provisioning
