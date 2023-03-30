@@ -24,8 +24,8 @@ Infrastructure also includes:
 
 ## Setup
 
-1. `sh build.sh`: Creates extended Airflow Docker image, builds and runs Docker container, runs pipeline.
-2. `sh shutdown.sh`: Shuts down pipeline and Docker containers.
+1. `make build`: Creates extended Airflow Docker image.
+2. `make up`: Setup Airflow Docker container network.
 
 ## TODOS
 
