@@ -19,3 +19,7 @@ tasks/transform_dbt/logs/
 dags/__pycache__/
 tasks/__pycache__/
 tasks/utils/__pycache__/
+
+# build scripts
+build.sh
+shutdown.sh
