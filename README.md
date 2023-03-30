@@ -19,7 +19,9 @@ Infrastructure also includes:
 
 ## Requirements
 
-1. Docker
+1. AWS S3, RDS -- Must add credentials to .env manually.
+2. Docker -- Required to run pipeline.
+3. Apache Supeset -- Must setup and add data sources manually.
 
 ## Setup
 
