@@ -10,8 +10,7 @@ FROM (
         location,
         COUNT(*) AS num_reviews
     FROM {{ ref('stg__reviews') }}
-    GROUP BY
-        product_id,
-        location
-) r
-    LEFT JOIN {{ ref('stg__products') }} p ON r.product_id = p.product_id
+    GROUP BY product_id, location
+    ) r
+LEFT JOIN {{ ref('stg__products') }} p
+ON r.product_id = p.product_id

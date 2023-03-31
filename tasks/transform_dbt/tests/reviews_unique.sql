@@ -1,4 +1,4 @@
--- Every product_id + review_id combo must be unique.
+/* Every product_id + review_id combo must be unique. */
 
 SELECT product_id, review_id, COUNT(*)
 FROM {{ ref('stg__reviews')}}

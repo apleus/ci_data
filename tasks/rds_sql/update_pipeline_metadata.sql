@@ -3,9 +3,9 @@ INSERT INTO lake.pipeline_metadata (
     date,
     review_count,
     status
-) VALUES (
-    '{product_id}',
-    '{date}',
-    '{review_count}',
-    '{status}'
-) ON CONFLICT (product_id, date, status) DO NOTHING;
+    ) VALUES (
+        '{product_id}',
+        '{date}',
+        '{review_count}',
+        '{status}'
+        ) ON CONFLICT (product_id, date, status) DO NOTHING;

@@ -12,5 +12,6 @@ FROM (
         rating,
         LENGTH(body) AS rev_len
     from {{ ref('stg__reviews') }}
-) r
-    LEFT JOIN {{ ref('stg__products') }} p ON r.product_id = p.product_id
+    ) r
+LEFT JOIN {{ ref('stg__products') }} p
+ON r.product_id = p.product_id

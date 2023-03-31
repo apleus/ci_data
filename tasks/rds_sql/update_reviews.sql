@@ -13,13 +13,10 @@ SELECT
         '{access_key}',
         '{secret_key}'
     );
+INSERT INTO lake.reviews
 
-INSERT INTO
-    lake.reviews
-SELECT
-    *
-FROM
-    reviews_temp
+SELECT *
+FROM reviews_temp
 ON CONFLICT (product_id, review_id) DO NOTHING;
 
 DROP TABLE reviews_temp;
