@@ -4,8 +4,8 @@ Automated pipeline that scrapes product reviews and metadata for competing Amazo
 
 ## Dashboard
 
-![Dashboard1](docs/dashboard-1.jpg)
-![Dashboard2](docs/dashboard-2.jpg)
+![Dashboard1](docs/dashboard-1.png)
+![Dashboard2](docs/dashboard-2.png)
 
 ## Pipeline Architecture
 
