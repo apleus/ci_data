@@ -2,6 +2,11 @@
 
 Automated pipeline that scrapes product reviews and metadata for competing Amazon products daily, then validates, transforms, and summarizes data in a dashboard.
 
+## Dashboard
+
+![Architecture](docs/dashboard-1.jpg)
+![Architecture](docs/dashboard-2.jpg)
+
 ## Pipeline Architecture
 
 ![Architecture](docs/architecture_diagram.jpg)
