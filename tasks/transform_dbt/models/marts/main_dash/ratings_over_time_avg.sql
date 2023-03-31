@@ -7,6 +7,7 @@ SELECT
     r.rating,
     r.location,
     r.avg_rating,
+    r.short_name,
     p.brand,
     p.title
 FROM (
@@ -19,7 +20,13 @@ FROM (
             PARTITION BY product_id
             ORDER BY date
             ROWS BETWEEN 30 PRECEDING AND 0 FOLLOWING
-            ) avg_rating
+            ) avg_rating,
+        CASE
+            WHEN product_id = 'B0B5W1YJN1' THEN 'K-Supreme'
+            WHEN product_id = 'B09B1TDJTW' THEN 'VertuoNext'
+            WHEN product_id = 'B01NBJ2UT5' THEN 'VertuoPlus'
+            ELSE 'Error: Update product shorthand name!'
+        END AS short_name
     FROM {{ ref('stg__reviews') }}
     ) r
 LEFT JOIN {{ ref('stg__products') }} p
