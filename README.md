@@ -2,6 +2,8 @@
 
 Automated pipeline that scrapes product reviews and metadata for competing Amazon products daily, then validates, transforms, and summarizes data in a dashboard.
 
+Products shown in example dashboard are (1) Keurig K-Supreme, (2) Nespresso VertuoNext, and (3) Nespresso VertuoPlus. These competing products were scraped for illustrative purposes to demonstrate pipeline functionality.
+
 ## Dashboard
 
 ![Dashboard1](docs/dashboard-1.png)
